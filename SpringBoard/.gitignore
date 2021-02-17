@@ -55,4 +55,4 @@ build/
 .LSOverride
 
 # Custom
-hikaricp-context.xml
+**/hikaricp-context.xml

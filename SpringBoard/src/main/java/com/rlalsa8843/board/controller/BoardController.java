@@ -1,22 +1,20 @@
 package com.rlalsa8843.board.controller;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.rlalsa8843.board.service.BoardService;
+import com.rlalsa8843.board.vo.Board;
+import com.rlalsa8843.board.vo.Reply;
 
-/**
- * Handles requests for the application home page.
- */
 @Controller
 public class BoardController {
 	@Autowired
@@ -24,23 +22,57 @@ public class BoardController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 	
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
-		logger.info(">>>>>>>>>>>>>>>>>>>>>>" + boardService.sample());
+	@RequestMapping(value = "/")
+	public ModelAndView home(ModelAndView mv) {		
+		List<Board> list = boardService.selectList();
 		
-		logger.info("Welcome home! The client locale is {}.", locale);
+		logger.debug("게시판 리스트 조회 완료");
 		
-		Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		mv.addObject("boardList", list);
+		mv.setViewName("list");
 		
-		String formattedDate = dateFormat.format(date);
+		return mv;
+	}
+	
+	@RequestMapping(value = "/create")
+	public ModelAndView create(ModelAndView mv) {
+		mv.setViewName("create");
 		
-		model.addAttribute("serverTime", formattedDate );
+		return mv;
+	}
+	
+	@RequestMapping(value ="/addPost", method = RequestMethod.POST)
+	public ModelAndView post(ModelAndView mv, Board board) {
+		logger.debug( board.toString() );
 		
-		return "home";
+		boardService.insertBoard(board);
+		
+		mv.setViewName("redirect:/");
+		return mv;
+	}
+	
+	@RequestMapping(value ="/addReply", method = RequestMethod.POST)
+	public ModelAndView reply(ModelAndView mv, Reply reply) {
+		logger.debug( reply.toString() );
+		
+		boardService.insertReply(reply);
+		
+		mv.setViewName("redirect:/view?no=" + reply.getBoardIdx());
+		return mv;
+	}
+	
+	@RequestMapping(value = "/view")
+	public ModelAndView view(@RequestParam("no") String idx, ModelAndView mv) {
+		Board board = boardService.selectOne(idx);
+		List<Reply> replyList = boardService.selectReply(idx);
+		boardService.updateHit(board);
+		
+		mv.addObject("board", board);
+		mv.addObject("replyList", replyList);
+		
+		mv.setViewName("view");
+		
+		return mv;
 	}
 	
 }

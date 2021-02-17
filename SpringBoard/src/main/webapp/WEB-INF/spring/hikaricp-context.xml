@@ -7,9 +7,9 @@
 	
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
-		<property name="jdbcUrl" value="jdbc:mysql://{address}:{port}/{database}"></property>
-		<property name="username" value="{username}"></property>
-		<property name="password" value="{password}"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://{address}:{port}/{database}?characterEncoding=utf-8"></property>
+		<property name="username" value="user01"></property>
+		<property name="password" value="!Q2w3e4r!!"></property>
 		<property name="connectionTestQuery" value="SELECT CURRENT_DATE"></property>
 	</bean>
 	
